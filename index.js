@@ -1,4 +1,4 @@
-require('dotenv').config();
+try { require('dotenv').config(); } catch(_) {}
 process.on('uncaughtException', (err) => {
   console.error('[Uncaught Exception]', err.message);
 });
