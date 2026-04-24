@@ -86,7 +86,6 @@ module.exports = {
           { name: '💰 Economy', value: '`/coins balance` `/coins daily` `/coins give` `/shop browse` `/shop buy`' },
           { name: '🎮 Gaming', value: '`/lfg` `/wouldyourather` `/8ball` `/tip`' },
           { name: '💡 Suggestions', value: '`/suggest`' },
-          { name: '🤖 AI', value: '`/chat`' },
           { name: '🛠️ Utility', value: '`/utility ping` `/utility avatar` `/utility serverinfo` `/utility coinflip` `/utility help`' },
           { name: '⚙️ Config', value: '`/config logs` `/config automod` `/config autorole` `/config blacklist`' },
           { name: '🏗️ Setup', value: '`/setup` `/reactionroles`' }
