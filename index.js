@@ -1,5 +1,5 @@
 require('dotenv').config();
-const { Client, GatewayIntentBits, Partials, Collection, EmbedBuilder, ChannelType, PermissionFlagsBits } = require('discord.js');
+const { Client, GatewayIntentBits, Partials, Collection, EmbedBuilder, ChannelType, PermissionFlagsBits, REST, Routes } = require('discord.js');
 const { addXp, addCoins } = require('./data/store');
 const cfg = require('./data/config');
 const fs = require('fs');
@@ -51,9 +51,23 @@ const xpCooldowns = new Map();       // prevent XP spam
 const commandsPath = path.join(__dirname, 'commands');
 const commandFiles = fs.readdirSync(commandsPath).filter((f) => f.endsWith('.js'));
 
+const slashCommandsJson = [];
 for (const file of commandFiles) {
   const command = require(path.join(commandsPath, file));
   client.commands.set(command.data.name, command);
+  slashCommandsJson.push(command.data.toJSON());
+}
+
+// ── Auto-register slash commands on startup ──────────────────────────────────
+async function registerSlashCommands(applicationId) {
+  try {
+    const rest = new REST().setToken(TOKEN);
+    console.log(`⏳ Registering ${slashCommandsJson.length} slash commands with Discord...`);
+    await rest.put(Routes.applicationCommands(applicationId), { body: slashCommandsJson });
+    console.log(`✅ Successfully registered ${slashCommandsJson.length} slash commands.`);
+  } catch (err) {
+    console.error('❌ Failed to register slash commands:', err.message);
+  }
 }
 
 // ── Daily gaming tips ─────────────────────────────────────────────────────────
@@ -86,8 +100,11 @@ const dailyQuestions = [
   '🎵 Which game has the best soundtrack?',
 ];
 
-client.once('clientReady', () => {
+client.once('clientReady', async () => {
   console.log(`✅ Logged in as ${client.user.tag}`);
+
+  // Auto-register slash commands every startup
+  await registerSlashCommands(client.application.id);
 
   // Daily tip at 10am UTC
   cron.schedule('0 10 * * *', () => {
